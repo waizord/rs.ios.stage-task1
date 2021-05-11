@@ -10,33 +10,31 @@
 
 - (NSArray <NSNumber *> *)trackLeaderBoard:(NSArray <NSNumber *> *)rankedArray
                                playerArray:(NSArray <NSNumber *> *)playerArray {
+    //NSArray *rankedArray = @[@(100), @(80), @(80), @(50), @(20)];
+    //NSArray *playerArray = @[@(5), @(10), @(20), @(80)];
+    //NSArray *expectedResults = @[@(5), @(5), @(4), @(2)];
     
-    if (playerArray.count == 0) {
-        return @[];
-    } else {
-        if ((rankedArray.count == 0)) {
-            NSMutableArray * result = [NSMutableArray new];
-            for (int i = 0; i < (int)playerArray.count; i++) {
-                [result addObject:@(1)];
-            }
-            return result;
-        } else {
-            if (rankedArray.count > playerArray.count) {
-                NSMutableArray * result = [NSMutableArray new];
-                for (int i = 0; i < rankedArray.count; i++) {
-                    NSNumber * num = [NSNumber numberWithInt:i];
-                    if (playerArray[i] >= rankedArray[i]) {
-                        [result addObject:num];
-                    } else {
-                        [result addObject:num];
-                    }
-                }
-            }else{
-                
+    NSMutableArray *result = [[NSMutableArray alloc] initWithCapacity:playerArray.count];
+    rankedArray = [rankedArray valueForKeyPath:[NSString stringWithFormat:@"distinctUnionOfObjects.%@", @"self"]];
+    
+    NSSortDescriptor * sort = [NSSortDescriptor sortDescriptorWithKey:@"self" ascending:NO];
+    rankedArray = [rankedArray sortedArrayUsingDescriptors:[NSArray arrayWithObject:sort]];
+    
+    int playerCount = (int)[playerArray count];
+    int rankCount = (int)[rankedArray count];
+    
+    for (int i = 0; i < playerCount; i++) {
+        [result insertObject:[NSNumber numberWithInteger:rankedArray.count + 1] atIndex:i];
+        int a = [playerArray[i] intValue];
+        for (int j = 0; j < rankCount; j++) {
+            int b = [[rankedArray objectAtIndex:j] intValue];
+            if (a >= b) {
+                [result replaceObjectAtIndex:i withObject:@(j+1)];
+                break;
             }
         }
     }
-    return @[];
+    return [result copy];
 }
 
 @end
